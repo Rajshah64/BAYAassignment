@@ -55,14 +55,22 @@ export class NASAAPI {
     }
   }
 
-  static async getOrbitalData(neoId: string): Promise<any> {
+  static async getOrbitalData(neoId: string): Promise<unknown> {
     try {
       const response = await nasaClient.get(
         `/neo/rest/v1/neo/${neoId}/orbital`
       );
       return response.data;
-    } catch (error: any) {
-      if (error.response?.status === 404) {
+    } catch (error: unknown) {
+      if (
+        error &&
+        typeof error === "object" &&
+        "response" in error &&
+        error.response &&
+        typeof error.response === "object" &&
+        "status" in error.response &&
+        error.response.status === 404
+      ) {
         console.log(`Orbital data not available for NEO ${neoId}`);
         return null;
       }

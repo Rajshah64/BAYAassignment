@@ -29,8 +29,17 @@ export default function EventDetailPage() {
         // Try to fetch orbital data, but don't fail if it's not available
         try {
           const orbitalData = await NASAAPI.getOrbitalData(params.id as string);
-          if (orbitalData && orbitalData.orbital_data) {
-            neoData.orbital_data = orbitalData.orbital_data;
+          if (
+            orbitalData &&
+            typeof orbitalData === "object" &&
+            orbitalData !== null &&
+            "orbital_data" in orbitalData
+          ) {
+            neoData.orbital_data = (
+              orbitalData as {
+                orbital_data: import("@/lib/types/neo").OrbitalData;
+              }
+            ).orbital_data;
           }
         } catch (orbitalError) {
           console.log("Orbital data not available for this NEO:", params.id);

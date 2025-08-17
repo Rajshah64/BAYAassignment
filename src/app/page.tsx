@@ -27,7 +27,7 @@ export default function HomePage() {
   }, [filters, groupedNEOs]);
 
   // Debug: Enhanced setFilters function
-  const handleFiltersChange = (newFilters: any) => {
+  const handleFiltersChange = (newFilters: Partial<typeof filters>) => {
     console.log("Filter change requested:", newFilters);
     console.log("Previous filters:", filters);
     setFilters(newFilters);
