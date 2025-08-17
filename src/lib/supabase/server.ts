@@ -1,5 +1,5 @@
-// lib/supabase/server.ts
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+// src/lib/supabase/server.ts
+import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 export async function createClient() {
@@ -19,7 +19,7 @@ export async function createClient() {
               cookieStore.set(name, value, options)
             );
           } catch {
-            // This happens in Server Components where sets aren't allowed
+            // This happens in Server Components (cannot set cookies there)
           }
         },
       },
