@@ -215,43 +215,6 @@ model User {
   name          String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  favorites     Favorite[]
-  searchHistory SearchHistory[]
-}
-```
-
-### Favorite Model
-
-```sql
-model Favorite {
-  id                String   @id @default(uuid())
-  userId            String
-  neoId             String
-  neoName           String
-  approachDate      DateTime
-  isHazardous       Boolean
-  estimatedDiameter Float
-  createdAt         DateTime @default(now())
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, neoId])
-  @@index([userId])
-}
-```
-
-### SearchHistory Model
-
-```sql
-model SearchHistory {
-  id        String   @id @default(uuid())
-  userId    String
-  startDate DateTime
-  endDate   DateTime
-  filters   Json?
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
 }
 ```
 

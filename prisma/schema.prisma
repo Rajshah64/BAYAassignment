@@ -16,42 +16,11 @@ datasource db {
 }
 
 model User {
-  id            String          @id @default(uuid())
-  email         String          @unique
-  name          String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  favorites     Favorite[]
-  searchHistory SearchHistory[]
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("users")
-}
-
-model Favorite {
-  id                String   @id @default(uuid())
-  userId            String
-  neoId             String
-  neoName           String
-  approachDate      DateTime
-  isHazardous       Boolean
-  estimatedDiameter Float
-  createdAt         DateTime @default(now())
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, neoId])
-  @@index([userId])
-  @@map("favorites")
-}
-
-model SearchHistory {
-  id        String   @id @default(uuid())
-  userId    String
-  startDate DateTime
-  endDate   DateTime
-  filters   Json?
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("search_history")
 }
