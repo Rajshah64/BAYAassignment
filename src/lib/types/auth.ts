@@ -1,11 +1,11 @@
 import { Prisma } from "@prisma/client";
-export type User = Prisma.UserGetPayload<{
-  select: {
-    id: true;
-    email: true;
-    name: true;
-  };
-}>;
+
+// In Prisma v6, we can directly use the User type or create a custom interface
+export type User = {
+  id: string;
+  email: string;
+  name: string | null;
+};
 
 export interface AuthState {
   user: User | null;
