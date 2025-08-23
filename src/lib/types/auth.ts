@@ -1,5 +1,12 @@
 import { Prisma } from "@prisma/client";
-export type User = Prisma.UserGetPayload<{}>;
+export type User = Prisma.UserGetPayload<{
+  select: {
+    id: true;
+    email: true;
+    name: true;
+  };
+}>;
+
 export interface AuthState {
   user: User | null;
   loading: boolean;

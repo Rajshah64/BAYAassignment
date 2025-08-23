@@ -57,7 +57,7 @@ export default function EventDetailPage() {
               }
             ).orbital_data;
           }
-        } catch (orbitalError) {
+        } catch {
           console.log("Orbital data not available for this NEO:", params.id);
           // Continue without orbital data - it's optional
         }

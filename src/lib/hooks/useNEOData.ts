@@ -6,7 +6,7 @@ import {
   getDefaultDateRange,
   getAvailableDateRange,
 } from "@/lib/api/nasa";
-import { NEO, NEOFeedResponse, FilterOptions } from "@/lib/types/neo";
+import { NEO, FilterOptions } from "@/lib/types/neo";
 import { toast } from "sonner";
 
 interface UseNEODataReturn {

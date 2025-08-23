@@ -9,9 +9,7 @@ import {
   AlertTriangle,
   ExternalLink,
   Calendar,
-  Ruler,
   Navigation,
-  Zap,
   Globe,
   Info,
 } from "lucide-react";

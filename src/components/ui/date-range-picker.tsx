@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 "use client";
 
 import React, { type FC, useState, useEffect, useRef } from "react";
@@ -291,7 +290,7 @@ export const DateRangePicker: FC<DateRangePickerProps> & {
   // Remove the useEffect that calls checkPreset
   useEffect(() => {
     checkPreset();
-  }, [range]);
+  }, [range, checkPreset]);
 
   // Remove the PresetButton component
   const PresetButton = ({
@@ -337,7 +336,7 @@ export const DateRangePicker: FC<DateRangePickerProps> & {
       openedRangeRef.current = range;
       openedRangeCompareRef.current = rangeCompare;
     }
-  }, [isOpen]);
+  }, [isOpen, range, rangeCompare]);
 
   return (
     <Popover

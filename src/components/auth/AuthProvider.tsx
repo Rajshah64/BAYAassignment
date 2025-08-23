@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { User } from "@supabase/supabase-js";
 import { AuthContextType, AuthState } from "@/lib/types/auth";
 import { toast } from "sonner";
 

@@ -10,7 +10,6 @@ export class NASAAPI {
       // Validate date range before making API call
       const start = new Date(startDate);
       const end = new Date(endDate);
-      const today = new Date();
 
       // NASA API restrictions:
       // - Maximum range is 7 days between start and end date

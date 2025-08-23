@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Rocket, Menu, User, LogOut, Sparkles } from "lucide-react";
+import { Rocket, Menu, LogOut, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
