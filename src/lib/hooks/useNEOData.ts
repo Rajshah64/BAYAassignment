@@ -22,7 +22,14 @@ interface UseNEODataReturn {
   availableDateRange: { pastLimit: string; futureLimit: string; today: string };
 }
 
-export function useNEOData(): UseNEODataReturn {
+interface UseNEODataOptions {
+  requireAuth?: boolean;
+  isAuthenticated?: boolean;
+}
+
+export function useNEOData(options: UseNEODataOptions = {}): UseNEODataReturn {
+  const { requireAuth = false, isAuthenticated = true } = options;
+
   const [neos, setNeos] = useState<NEO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +47,13 @@ export function useNEOData(): UseNEODataReturn {
 
   const fetchNEOs = useCallback(
     async (startDate: string, endDate: string, append = false) => {
+      // Prevent API calls if authentication is required but user is not authenticated
+      if (requireAuth && !isAuthenticated) {
+        setError("Authentication required to access this feature");
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
@@ -71,11 +85,17 @@ export function useNEOData(): UseNEODataReturn {
         setLoading(false);
       }
     },
-    [availableDateRange.futureLimit]
+    [availableDateRange.futureLimit, requireAuth, isAuthenticated]
   );
 
   const loadMore = useCallback(async () => {
     if (loading || !hasMore) return;
+
+    // Prevent API calls if authentication is required but user is not authenticated
+    if (requireAuth && !isAuthenticated) {
+      setError("Authentication required to access this feature");
+      return;
+    }
 
     // Get the current end date from filters or currentEndDate
     const lastEndDate = filters.endDate || currentEndDate;
@@ -120,15 +140,29 @@ export function useNEOData(): UseNEODataReturn {
     hasMore,
     fetchNEOs,
     availableDateRange.futureLimit,
+    requireAuth,
+    isAuthenticated,
   ]);
 
   const refresh = useCallback(async () => {
+    // Prevent API calls if authentication is required but user is not authenticated
+    if (requireAuth && !isAuthenticated) {
+      setError("Authentication required to access this feature");
+      return;
+    }
+
     const { startDate, endDate } = getDefaultDateRange();
     await fetchNEOs(startDate, endDate, false);
-  }, [fetchNEOs]);
+  }, [fetchNEOs, requireAuth, isAuthenticated]);
 
   const setFilters = useCallback(
     (newFilters: Partial<FilterOptions>) => {
+      // Prevent filter changes if authentication is required but user is not authenticated
+      if (requireAuth && !isAuthenticated) {
+        setError("Authentication required to access this feature");
+        return;
+      }
+
       setFiltersState((prev) => {
         const updatedFilters = { ...prev, ...newFilters };
 
@@ -166,12 +200,18 @@ export function useNEOData(): UseNEODataReturn {
         return updatedFilters;
       });
     },
-    [fetchNEOs]
+    [fetchNEOs, requireAuth, isAuthenticated]
   );
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    // Only fetch data if user is authenticated or authentication is not required
+    if (!requireAuth || isAuthenticated) {
+      refresh();
+    } else {
+      setLoading(false);
+      setError("Authentication required to access this feature");
+    }
+  }, [refresh, requireAuth, isAuthenticated]);
 
   // Helper function to check if a date is within the filter range
   const isDateInRange = (dateString: string): boolean => {
