@@ -13,22 +13,14 @@ export class NASAAPI {
       const today = new Date();
 
       // NASA API restrictions:
-      // - Cannot fetch dates more than 7 days in the past
-      // - Cannot fetch dates more than 7 days in the future
-      // - Maximum range is 7 days
+      // - Maximum range is 7 days between start and end date
+      // - Any 7-day period is allowed (past, present, or future)
 
       const daysDiff = Math.ceil(
         (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
       );
       if (daysDiff > 7) {
         throw new Error("NASA API only allows 7-day ranges maximum");
-      }
-
-      const daysFromToday = Math.ceil(
-        (start.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-      );
-      if (daysFromToday < -7 || daysFromToday > 7) {
-        throw new Error("NASA API only allows dates within 7 days of today");
       }
 
       const response = await nasaClient.get("/neo/rest/v1/feed", {
@@ -96,8 +88,10 @@ export const getAvailableDateRange = () => {
   const pastLimit = new Date();
   const futureLimit = new Date();
 
-  pastLimit.setDate(today.getDate() - 7);
-  futureLimit.setDate(today.getDate() + 7);
+  // NASA API allows querying any 7-day period, not just 7 days from today
+  // Setting a reasonable future limit for practical purposes (1 year)
+  pastLimit.setFullYear(today.getFullYear() - 1);
+  futureLimit.setFullYear(today.getFullYear() + 1);
 
   return {
     pastLimit: pastLimit.toISOString().split("T")[0],

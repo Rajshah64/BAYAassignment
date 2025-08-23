@@ -77,26 +77,45 @@ export function useNEOData(): UseNEODataReturn {
   const loadMore = useCallback(async () => {
     if (loading || !hasMore) return;
 
-    // Calculate next date range (7 days from current end)
-    const nextStartDate = new Date(currentEndDate);
+    // Get the current end date from filters or currentEndDate
+    const lastEndDate = filters.endDate || currentEndDate;
+
+    if (!lastEndDate) {
+      console.error("No end date available for load more");
+      return;
+    }
+
+    // Calculate next date range (3 days from current end)
+    const nextStartDate = new Date(lastEndDate);
     nextStartDate.setDate(nextStartDate.getDate() + 1);
 
     const nextEndDate = new Date(nextStartDate);
-    nextEndDate.setDate(nextEndDate.getDate() + 6); // 7 days total
+    nextEndDate.setDate(nextEndDate.getDate() + 2); // 3 days total
 
     const nextStartDateStr = nextStartDate.toISOString().split("T")[0];
     const nextEndDateStr = nextEndDate.toISOString().split("T")[0];
 
-    // Check if we're hitting NASA API limits
+    console.log(
+      `Loading more data from ${nextStartDateStr} to ${nextEndDateStr}`
+    );
+
+    // Check if we're hitting practical limits (but NASA API should handle any 7-day period)
     if (nextEndDate > new Date(availableDateRange.futureLimit)) {
       setHasMore(false);
-      toast.info("Reached NASA API date limit (7 days in the future)");
+      toast.info("Reached practical date limit");
       return;
     }
 
     await fetchNEOs(nextStartDateStr, nextEndDateStr, true);
+
+    // Update the filters to reflect the new end date for subsequent load more calls
+    setFiltersState((prev) => ({
+      ...prev,
+      endDate: nextEndDateStr,
+    }));
   }, [
     currentEndDate,
+    filters.endDate,
     loading,
     hasMore,
     fetchNEOs,
@@ -108,9 +127,47 @@ export function useNEOData(): UseNEODataReturn {
     await fetchNEOs(startDate, endDate, false);
   }, [fetchNEOs]);
 
-  const setFilters = useCallback((newFilters: Partial<FilterOptions>) => {
-    setFiltersState((prev) => ({ ...prev, ...newFilters }));
-  }, []);
+  const setFilters = useCallback(
+    (newFilters: Partial<FilterOptions>) => {
+      setFiltersState((prev) => {
+        const updatedFilters = { ...prev, ...newFilters };
+
+        // When date range changes, fetch new data from NASA API
+        if (newFilters.startDate || newFilters.endDate) {
+          const startDate = newFilters.startDate || updatedFilters.startDate;
+          const endDate = newFilters.endDate || updatedFilters.endDate;
+
+          if (startDate && endDate) {
+            console.log("Date range changed, fetching new data:", {
+              startDate,
+              endDate,
+            });
+
+            // Validate 7-day limit before making API call
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const daysDiff = Math.ceil(
+              (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
+            );
+
+            if (daysDiff <= 7) {
+              // Fetch new data for the selected date range
+              fetchNEOs(startDate, endDate, false);
+              // Reset hasMore when new date range is selected
+              setHasMore(true);
+            } else {
+              setError("Date range cannot exceed 7 days (NASA API limitation)");
+              toast.error("Please select a date range of 7 days or less");
+              return prev; // Don't update filters if invalid
+            }
+          }
+        }
+
+        return updatedFilters;
+      });
+    },
+    [fetchNEOs]
+  );
 
   useEffect(() => {
     refresh();

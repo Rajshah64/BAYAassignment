@@ -144,8 +144,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AlertTriangle, Calendar, Ruler } from "lucide-react";
+import { AlertTriangle, Calendar, Ruler, Info } from "lucide-react";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 interface EventFiltersProps {
   filters: FilterOptions;
@@ -195,6 +197,18 @@ export default function EventFilters({
 
     console.log("Formatted dates for filters:", { startDate, endDate }); // Debug log
 
+    // Validate 7-day limit before updating filters
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const daysDiff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (daysDiff > 7) {
+        toast.error("Please select a date range of 7 days or less (NASA API limitation)");
+        return; // Don't update filters if invalid
+      }
+    }
+
     onFiltersChange({
       startDate,
       endDate,
@@ -231,11 +245,14 @@ export default function EventFilters({
             locale="en-US"
             showCompare={false}
           />
-          {/* Debug display - remove this once working */}
-          {/* <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
-            Debug: Start: {filters.startDate || "none"} | End:{" "}
-            {filters.endDate || "none"}
-          </div> */}
+          
+          {/* Add info about NASA API 7-day limit */}
+          <Alert variant="default" className="mt-2">
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              NASA API provides data for any 7-day period. Select up to 7 consecutive days.
+            </AlertDescription>
+          </Alert>
         </div>
 
         {/* Hazardous Filter */}

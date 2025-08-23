@@ -69,7 +69,7 @@ interface Preset {
   label: string;
 }
 
-// Define presets
+// Remove the PRESETS array and related preset logic
 const PRESETS: Preset[] = [
   { name: "today", label: "Today" },
   { name: "yesterday", label: "Yesterday" },
@@ -118,6 +118,7 @@ export const DateRangePicker: FC<DateRangePickerProps> & {
   const openedRangeRef = useRef<DateRange | undefined>(undefined);
   const openedRangeCompareRef = useRef<DateRange | undefined>(undefined);
 
+  // Remove the preset-related state and functions
   const [selectedPreset, setSelectedPreset] = useState<string | undefined>(
     undefined
   );
@@ -140,6 +141,7 @@ export const DateRangePicker: FC<DateRangePickerProps> & {
     };
   }, []);
 
+  // Remove the getPresetRange function
   const getPresetRange = (presetName: string): DateRange => {
     const preset = PRESETS.find(({ name }) => name === presetName);
     if (!preset) throw new Error(`Unknown date range preset: ${presetName}`);
@@ -201,6 +203,7 @@ export const DateRangePicker: FC<DateRangePickerProps> & {
     return { from, to };
   };
 
+  // Remove the setPreset function
   const setPreset = (preset: string): void => {
     const range = getPresetRange(preset);
     setRange(range);
@@ -223,6 +226,7 @@ export const DateRangePicker: FC<DateRangePickerProps> & {
     }
   };
 
+  // Remove the checkPreset function
   const checkPreset = (): void => {
     for (const preset of PRESETS) {
       const presetRange = getPresetRange(preset.name);
@@ -284,10 +288,12 @@ export const DateRangePicker: FC<DateRangePickerProps> & {
     );
   };
 
+  // Remove the useEffect that calls checkPreset
   useEffect(() => {
     checkPreset();
   }, [range]);
 
+  // Remove the PresetButton component
   const PresetButton = ({
     preset,
     label,
