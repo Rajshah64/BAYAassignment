@@ -9,7 +9,7 @@ import {
   SheetTrigger,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import {
   DropdownMenu,
@@ -23,6 +23,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, signOut } = useAuth();
+
+  // Debug: Log user state changes
+  useEffect(() => {
+    console.log("Header: User state changed:", user?.email);
+  }, [user]);
 
   const getInitials = (email: string) => {
     return email.substring(0, 2).toUpperCase();
@@ -141,7 +146,15 @@ export default function Header() {
                     </div>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      onClick={() => signOut()}
+                      onClick={async () => {
+                        console.log("Sign out button clicked");
+                        try {
+                          await signOut();
+                          console.log("Sign out completed");
+                        } catch (error) {
+                          console.error("Sign out error:", error);
+                        }
+                      }}
                       className="text-sm hover:bg-accent/50 transition-colors"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
